@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI 工作台 · DeepSeek + 火山方舟</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%236366f1'/%3E%3Ctext x='50' y='68' font-size='46' text-anchor='middle' fill='white' font-family='sans-serif'%3EAI%3C/text%3E%3C/svg%3E" />
+  <script>
+    try {
+      var savedTheme = localStorage.getItem('aichat-theme');
+      if (!savedTheme) {
+        savedTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.dataset.theme = savedTheme;
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <div class="brand">
+          <span class="logo">AI</span>
+          <div class="brand-text">
+            <h1>AI 工作台</h1>
+            <p>DeepSeek · 火山方舟</p>
+          </div>
+        </div>
+        <button id="themeBtn" class="icon-btn" type="button" title="切换主题">🌙</button>
+      </div>
+
+      <button id="newChatBtn" class="new-chat-btn" type="button">
+        <span class="plus">＋</span> 新聊天
+      </button>
+
+      <div class="platform-list" id="platformList"></div>
+
+      <div class="sidebar-foot">
+        <button id="settingsBtn" class="foot-btn" type="button">⚙ API Key 设置</button>
+        <p class="storage-note">对话保存在本机浏览器</p>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main">
+      <header class="main-header">
+        <button id="menuBtn" class="icon-btn menu-btn" type="button" title="对话列表">☰</button>
+        <div class="header-info">
+          <h2 id="convTitle">新对话</h2>
+          <span id="modelChip" class="model-chip" data-platform="deepseek">DeepSeek Flash</span>
+        </div>
+      </header>
+
+      <div class="chat" id="chat" aria-live="polite"></div>
+
+      <footer class="composer-wrap">
+        <div class="composer">
+          <div class="platform-switch" id="platformSwitch">
+            <button class="platform-btn active" data-platform="deepseek" type="button">
+              <span class="platform-btn-icon">✦</span> DeepSeek
+            </button>
+            <button class="platform-btn" data-platform="ark" type="button">
+              <span class="platform-btn-icon">◈</span> 火山方舟
+            </button>
+          </div>
+
+          <div class="model-toolbar">
+            <label class="select-field model-field">
+              <span>模型</span>
+              <select id="modelSelect"></select>
+            </label>
+            <div class="param-fields" id="paramFields"></div>
+          </div>
+          <div class="model-note" id="modelNote"></div>
+
+          <div class="attach-preview" id="attachPreview"></div>
+
+          <div class="input-row">
+            <button id="attachBtn" class="attach-btn" type="button" title="上传文件">
+              <span class="attach-icon">📎</span>
+              <span class="attach-label" id="attachLabel">文件</span>
+            </button>
+            <textarea id="input" rows="1" placeholder="输入消息…"></textarea>
+            <button id="sendBtn" class="send-btn" type="button">发送</button>
+          </div>
+          <div class="hint" id="hint">Enter 发送 · Shift+Enter 换行</div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <input type="file" id="fileInput" hidden />
+
+  <div class="modal-backdrop" id="settingsModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <h2 id="settingsTitle">API Key 设置</h2>
+
+      <label class="field-label" for="deepseekKey">DeepSeek API Key</label>
+      <div class="key-field">
+        <input type="password" id="deepseekKey" placeholder="sk-…" autocomplete="off" />
+        <button type="button" class="eye-btn" data-target="deepseekKey">👁</button>
+      </div>
+      <p class="field-note">
+        <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener">获取 DeepSeek Key</a>
+      </p>
+
+      <label class="field-label" for="arkKey">火山方舟 API Key</label>
+      <div class="key-field">
+        <input type="password" id="arkKey" placeholder="火山方舟 API Key" autocomplete="off" />
+        <button type="button" class="eye-btn" data-target="arkKey">👁</button>
+      </div>
+      <p class="field-note">
+        <a href="https://console.volcengine.com/ark/region:cn-beijing/apikey" target="_blank" rel="noopener">获取火山方舟 Key</a>
+      </p>
+
+      <p class="key-note">
+        Key 仅保存在本机浏览器（localStorage），随每次请求直接转发给对应官方接口，服务器不会落盘存储。
+        DeepSeek 文件上传按官方 Files API 支持 JPEG / PNG / GIF / WebP；火山方舟视频/3D 模型需在控制台开通对应模型服务。
+      </p>
+
+      <div class="modal-actions">
+        <button id="closeSettings" class="primary-btn" type="button">完成</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "aichat-webui",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DeepSeek 多模型对话与文件理解 + 火山方舟 Seedream 多模型生图的轻量 WebUI",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
