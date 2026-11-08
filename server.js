@@ -1,10 +1,5 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const { Buffer } = require('node:buffer');
 
-const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
-const PUBLIC_DIR = path.join(__dirname, 'public');
 const MAX_JSON_BODY = 128 * 1024 * 1024;
 const MAX_FILE_BODY = 70 * 1024 * 1024;
 
@@ -140,6 +135,10 @@ async function readJsonBody(req) {
 }
 
 function serveStatic(req, res) {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const publicDir = path.join(__dirname, 'public');
+
   let pathname;
   try {
     pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
@@ -149,8 +148,8 @@ function serveStatic(req, res) {
   }
   if (pathname === '/') pathname = '/index.html';
 
-  const resolved = path.resolve(PUBLIC_DIR, '.' + path.normalize(pathname));
-  if (!resolved.startsWith(PUBLIC_DIR + path.sep) && resolved !== PUBLIC_DIR) {
+  const resolved = path.resolve(publicDir, '.' + path.normalize(pathname));
+  if (!resolved.startsWith(publicDir + path.sep) && resolved !== publicDir) {
     res.writeHead(403, CORS);
     return res.end('Forbidden');
   }
@@ -431,7 +430,7 @@ async function handleArkTaskQuery(req, res, body) {
   );
 }
 
-const server = http.createServer(async (req, res) => {
+async function handleRequest(req, res) {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, CORS);
     return res.end();
@@ -494,14 +493,21 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (pathname.startsWith('/api/')) {
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', ...CORS });
+    return res.end('Not Found');
+  }
+
   if (req.method === 'GET') {
     return serveStatic(req, res);
   }
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', ...CORS });
   res.end('Not Found');
-});
+}
 
-server.listen(PORT, HOST, () => {
-  console.log('AI 工作台已启动： http://' + HOST + ':' + PORT);
-});
+module.exports = { handleRequest };
+
+if (require.main === module) {
+  console.log('请使用 npm start 或 node local-server.js 启动本地服务。');
+}
